@@ -33,7 +33,7 @@ public class Main {
      */
     private void run() {
         if (userProfile == null) {
-            initializeUserProfile();
+            initialiseUserProfile();
         } else {
             System.out.println("Welcome back, " + userProfile.getUsername() + "!");
         }
@@ -42,9 +42,9 @@ public class Main {
     }
 
     /**
-     * Initializes a new user profile.
+     * Initialises a new user profile.
      */
-    private void initializeUserProfile() {
+    private void initialiseUserProfile() {
         System.out.println("Welcome to the Video Games Collection app!");
         System.out.println("Let's set up your profile.");
 
