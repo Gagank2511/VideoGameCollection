@@ -10,7 +10,7 @@ public class UserProfile {
     private Map<AbstractGame, String> gameReviews;   //Store reviews 
     private Map<AbstractGame, Integer> gameRatings;  // store ratings
 
-
+    
     public UserProfile(String username, String preferredPlatform){
         this.username = username;
         this.preferredPlatform = preferredPlatform;
@@ -18,6 +18,9 @@ public class UserProfile {
         this.gameReviews = new HashMap<>();
         this.gameRatings = new HashMap<>();
         
+    }
+    public List<AbstractGame> getGamesOwned() {
+        return new ArrayList<AbstractGame>();
     }
     public String getUsername() {
         return username;
