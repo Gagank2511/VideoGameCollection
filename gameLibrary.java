@@ -25,4 +25,8 @@ public class GameLibrary {
         return;
     }
 
+    public static void remove(AbstractGame game) {
+        games.remove(game);
+    }
+
 }
