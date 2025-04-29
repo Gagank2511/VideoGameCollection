@@ -1,7 +1,9 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Main application class for the Video Game Collection application.
@@ -18,13 +20,18 @@ public class Main {
      * @param args Command line arguments (not used)
      */
     public static void main(String[] args) {
+        Main app = null;
         try {
-            Main app = new Main();
-            app.loadData(); // Try to load existing data first
+            app = new Main();
+            app.loadData();
             app.run();
         } catch (Exception e) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Application error", e);
             System.out.println("An unexpected error occurred: " + e.getMessage());
+        } finally {
+            if (app != null) {
+                app.cleanup();
+            }
         }
     }
 
@@ -75,7 +82,7 @@ public class Main {
                     platform = GamePlatform.values()[platformChoice - 1];
                 } else {
                     System.out.println("Invalid choice. Please enter a number between 1 and " +
-                                      GamePlatform.values().length);
+                            GamePlatform.values().length);
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
@@ -131,59 +138,64 @@ public class Main {
                 System.out.println("7. Update game progress");
                 System.out.println("8. User profile");
                 System.out.println("9. Save and Exit");
-                System.out.print("Choose an option (1-9): ");
+                System.out.print("\nChoose an option (1-9): ");
 
-                int choice;
-                try {
-                    choice = Integer.parseInt(scanner.nextLine());
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter a number.");
+                String input = scanner.nextLine().trim();
+                if (input.isEmpty()) {
+                    System.out.println("Please enter a number.");
                     continue;
                 }
 
+                int choice = Integer.parseInt(input);
                 if (choice < 1 || choice > 9) {
-                    System.out.println("Invalid choice. Please enter a number between 1 and 9.");
+                    System.out.println("Please enter a number between 1 and 9.");
                     continue;
                 }
 
-                switch (choice) {
-                    case 1:
-                        addGame();
-                        break;
-                    case 2:
-                        viewLibrary();
-                        break;
-                    case 3:
-                        searchGamesMenu();
-                        break;
-                    case 4:
-                        sortGamesMenu();
-                        break;
-                    case 5:
-                        rateOrReviewGame();
-                        break;
-                    case 6:
-                        removeGame();
-                        break;
-                    case 7:
-                        updateGameProgress();
-                        break;
-                    case 8:
-                        userProfileMenu();
-                        break;
-                    case 9:
-                        if (saveData()) {
-                            System.out.println("Thank you for using the Video Games Collection app!");
-                            running = false;
-                        }
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please try again.");
+                handleMenuChoice(choice);
+                if (choice == 9) {
+                    running = false;
                 }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
             } catch (Exception e) {
                 System.out.println("An error occurred: " + e.getMessage());
                 LOGGER.log(Level.WARNING, "Error in main menu", e);
             }
+        }
+    }
+
+    private void handleMenuChoice(int choice) {
+        switch (choice) {
+            case 1:
+                addGame();
+                break;
+            case 2:
+                viewLibrary();
+                break;
+            case 3:
+                searchGamesMenu();
+                break;
+            case 4:
+                sortGamesMenu();
+                break;
+            case 5:
+                rateOrReviewGame();
+                break;
+            case 6:
+                removeGame();
+                break;
+            case 7:
+                updateGameProgress();
+                break;
+            case 8:
+                userProfileMenu();
+                break;
+            case 9:
+                if (saveData()) {
+                    System.out.println("\nThank you for using the Video Games Collection app!");
+                }
+                break;
         }
     }
 
@@ -193,39 +205,35 @@ public class Main {
     private void addSampleGames() {
         // Create sample single-player games
         SinglePlayer zelda = new SinglePlayer(
-            "The Legend of Zelda: Breath of the Wild",
-            GameGenre.ACTION_ADVENTURE,
-            GamePlatform.NINTENDO_SWITCH,
-            2017,
-            "Nintendo",
-            120
-        );
+                "The Legend of Zelda: Breath of the Wild",
+                GameGenre.ACTION_ADVENTURE,
+                GamePlatform.NINTENDO_SWITCH,
+                2017,
+                "Nintendo",
+                120);
 
         SinglePlayer godOfWar = new SinglePlayer(
-            "God of War",
-            GameGenre.ACTION_ADVENTURE,
-            GamePlatform.PLAYSTATION_4,
-            2018,
-            "Santa Monica Studio",
-            26
-        );
+                "God of War",
+                GameGenre.ACTION_ADVENTURE,
+                GamePlatform.PLAYSTATION_4,
+                2018,
+                "Santa Monica Studio",
+                26);
 
         // Create sample multiplayer games
         Multiplayer fortnite = new Multiplayer(
-            "Fortnite",
-            GameGenre.BATTLE_ROYALE,
-            GamePlatform.MULTIPLE,
-            2017,
-            "Epic Games"
-        );
+                "Fortnite",
+                GameGenre.BATTLE_ROYALE,
+                GamePlatform.MULTIPLE,
+                2017,
+                "Epic Games");
 
         Multiplayer warzone = new Multiplayer(
-            "Call of Duty: Warzone",
-            GameGenre.BATTLE_ROYALE,
-            GamePlatform.MULTIPLE,
-            2020,
-            "Infinity Ward"
-        );
+                "Call of Duty: Warzone",
+                GameGenre.BATTLE_ROYALE,
+                GamePlatform.MULTIPLE,
+                2020,
+                "Infinity Ward");
 
         // Add games to library and user profile
         GameLibrary.add(zelda);
@@ -294,15 +302,22 @@ public class Main {
      * Searches for games by title.
      */
     private void searchGamesByTitle() {
-        System.out.print("Enter title to search: ");
-        String title = scanner.nextLine();
+        System.out.print("\nEnter title to search (or press Enter to cancel): ");
+        String title = scanner.nextLine().trim().toLowerCase();
+        
+        if (title.isEmpty()) {
+            System.out.println("Search cancelled.");
+            return;
+        }
 
-        List<AbstractGame> results = userProfile.searchGamesByTitle(title);
+        List<AbstractGame> results = userProfile.getGamesOwned().stream()
+            .filter(game -> game.getTitle().toLowerCase().contains(title))
+            .collect(Collectors.toList());
 
         if (results.isEmpty()) {
-            System.out.println("No games found matching '" + title + "'.");
+            System.out.println("\nNo games found matching '" + title + "'.");
         } else {
-            System.out.println("\nFound " + results.size() + " game(s) matching '" + title + "':");
+            System.out.println("\nFound " + results.size() + " game(s):");
             displayGamesList(results);
         }
     }
@@ -370,34 +385,41 @@ public class Main {
      */
     private void displayGamesList(List<AbstractGame> games) {
         if (games.isEmpty()) {
-            System.out.println("No games to display.");
+            System.out.println("\nNo games to display.");
             return;
         }
 
-        System.out.println("\n--------------------------------------------------");
-        for (AbstractGame game : games) {
-            System.out.println("Title: " + game.getTitle());
-            System.out.println("Genre: " + game.getGenreString());
-            System.out.println("Platform: " + game.getPlatformString());
-            System.out.println("Developer: " + game.getDeveloper());
-            System.out.println("Release Year: " + game.getReleaseYear());
+        final int ITEMS_PER_PAGE = 5;
+        int currentPage = 1;
+        int totalPages = (games.size() + ITEMS_PER_PAGE - 1) / ITEMS_PER_PAGE;
 
-            // Display progress
-            System.out.println("Progress: " + game.getProgress());
+        while (true) {
+            System.out.println("\n----------------------------------------");
+            int start = (currentPage - 1) * ITEMS_PER_PAGE;
+            int end = Math.min(start + ITEMS_PER_PAGE, games.size());
 
-            // Display rating if available
-            Integer rating = userProfile.getGameRating(game);
-            if (rating != null) {
-                System.out.println("Your Rating: " + rating + "/5");
+            for (int i = start; i < end; i++) {
+                System.out.println("\n" + (i + 1) + ". " + games.get(i).toString());
             }
 
-            // Display review if available
-            String review = userProfile.getGameReview(game);
-            if (review != null) {
-                System.out.println("Your Review: " + review);
+            if (totalPages > 1) {
+                System.out.println("\n----------------------------------------");
+                System.out.printf("Page %d of %d\n", currentPage, totalPages);
+                System.out.print("(N)ext, (P)revious, or (E)xit to menu: ");
+                
+                String choice = scanner.nextLine().trim().toUpperCase();
+                if (choice.equals("N") && currentPage < totalPages) {
+                    currentPage++;
+                } else if (choice.equals("P") && currentPage > 1) {
+                    currentPage--;
+                } else if (choice.equals("E")) {
+                    break;
+                }
+            } else {
+                System.out.println("\nPress Enter to continue...");
+                scanner.nextLine();
+                break;
             }
-
-            System.out.println("--------------------------------------------------");
         }
     }
 
@@ -494,8 +516,8 @@ public class Main {
 
             // Get game title
             System.out.print("Enter game title: ");
-            String title = scanner.nextLine();
-            if (title.trim().isEmpty()) {
+            String title = scanner.nextLine().trim();
+            if (title.isEmpty()) {
                 System.out.println("Title cannot be empty. Operation cancelled.");
                 return;
             }
@@ -538,20 +560,22 @@ public class Main {
                 }
             }
 
-            // Get release year
-            int releaseYear = 0;
-            while (releaseYear < 1950 || releaseYear > 2100) {
+            // Validate release year
+            int releaseYear;
+            int currentYear = java.time.Year.now().getValue();
+            do {
+                System.out.print("Enter release year (1950-" + currentYear + "): ");
                 try {
-                    System.out.print("\nEnter release year (1950-2100): ");
-                    releaseYear = Integer.parseInt(scanner.nextLine());
-
-                    if (releaseYear < 1950 || releaseYear > 2100) {
-                        System.out.println("Year must be between 1950 and 2100. Please try again.");
+                    releaseYear = Integer.parseInt(scanner.nextLine().trim());
+                    if (releaseYear < 1950 || releaseYear > currentYear) {
+                        System.out.println("Please enter a valid year between 1950 and " + currentYear);
+                        continue;
                     }
+                    break;
                 } catch (NumberFormatException e) {
                     System.out.println("Invalid input. Please enter a valid year.");
                 }
-            }
+            } while (true);
 
             // Get developer
             System.out.print("\nEnter game developer: ");
@@ -600,14 +624,31 @@ public class Main {
             }
 
             // Add the game to the library and user profile
-            GameLibrary.add(game);
-            userProfile.addGame(game);
-
-            System.out.println("\nGame added successfully!");
-            System.out.println(game);
+            if (addGameSafely(game)) {
+                System.out.println("\nGame added successfully!");
+                System.out.println(game);
+            } else {
+                System.out.println("Failed to add game. Please try again.");
+            }
 
         } catch (IllegalArgumentException e) {
             System.out.println("Error adding game: " + e.getMessage());
+        }
+    }
+
+    private boolean addGameSafely(AbstractGame game) {
+        try {
+            GameLibrary.add(game);
+            try {
+                userProfile.addGame(game);
+                return true;
+            } catch (Exception e) {
+                GameLibrary.remove(game);  // Rollback if userProfile add fails
+                throw e;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to add game: " + game.getTitle(), e);
+            return false;
         }
     }
 
@@ -615,11 +656,34 @@ public class Main {
      * Loads data from files.
      */
     private void loadData() {
-        Object[] data = DataManager.loadData();
-        GameLibrary.setGames((List<AbstractGame>) data[0]);
-        userProfile = (UserProfile) data[1];
+        try {
+            Object[] data = DataManager.loadData();
+            if (data == null || data.length < 2) {
+                initializeDefaultProfile();
+                return;
+            }
+            
+            List<AbstractGame> games = (data[0] instanceof List<?>) ? (List<AbstractGame>) data[0] : new ArrayList<>();
+            UserProfile profile = (data[1] instanceof UserProfile) ? (UserProfile) data[1] : null;
+            
+            if (profile == null) {
+                initializeDefaultProfile();
+                return;
+            }
 
-        LOGGER.info("Loaded " + GameLibrary.getGames().size() + " games from storage");
+            GameLibrary.setGames(games);
+            userProfile = profile;
+            LOGGER.info("Loaded " + games.size() + " games from storage");
+        } catch (Exception e) {
+            LOGGER.severe("Error loading data: " + e.getMessage());
+            initializeDefaultProfile();
+        }
+    }
+
+    private void initializeDefaultProfile() {
+        LOGGER.warning("Creating default profile");
+        userProfile = new UserProfile("Guest", GamePlatform.OTHER);
+        GameLibrary.setGames(new ArrayList<>());
     }
 
     /**
@@ -945,6 +1009,12 @@ public class Main {
             }
         } else {
             System.out.println("Operation cancelled.");
+        }
+    }
+
+    public void cleanup() {
+        if (scanner != null) {
+            scanner.close();
         }
     }
 }
