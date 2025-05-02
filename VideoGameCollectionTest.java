@@ -150,6 +150,9 @@ public class VideoGameCollectionTest {
         assert game.getLevelsCompleted() == 5 : "updateProgress() failed";
         assert game.getProgress().equals("5/10 Levels completed") : "getProgress() failed";
 
+        // Test completion percentage
+        assert game.getCompletionPercentage() == 50.0 : "getCompletionPercentage() failed";
+
         // Test progress validation
         try {
             game.updateProgress("-1");
@@ -192,6 +195,9 @@ public class VideoGameCollectionTest {
         assert game.getLosses() == 5 : "updateProgress() failed for losses";
         assert game.getProgress().equals("W/L: 10/5") : "getProgress() failed";
         assert Math.abs(game.getWinRate() - 66.67) < 0.01 : "getWinRate() failed";
+
+        // Test completion percentage (should be same as win rate for multiplayer)
+        assert Math.abs(game.getCompletionPercentage() - 66.67) < 0.01 : "getCompletionPercentage() failed";
 
         // Test progress validation
         try {
