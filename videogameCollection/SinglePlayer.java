@@ -103,6 +103,19 @@ public class SinglePlayer extends AbstractGame {
         return levelsCompleted + "/" + totalLevels + " Levels completed";
     }
 
+    /**
+     * Calculates the completion percentage based on levels completed.
+     *
+     * @return The percentage of levels completed (0-100)
+     */
+    @Override
+    public double getCompletionPercentage() {
+        if (totalLevels == 0) {
+            return 0.0;
+        }
+        return ((double) levelsCompleted / totalLevels) * 100.0;
+    }
+
     @Override
     public String toString() {
         return super.toString() + " - Single Player - " + getProgress();
