@@ -1,5 +1,13 @@
 import java.util.ArrayList;
 
+import videogameCollection.AbstractGame;
+import videogameCollection.GameGenre;
+import videogameCollection.GamePlatform;
+import videogameCollection.Multiplayer;
+import videogameCollection.SinglePlayer;
+import videogameCollection.UserProfile;
+import videogameCollection.GameLibrary;
+
 /**
  * Unit tests for the Video Game Collection application.
  * Tests the core functionality of the application classes.
