@@ -110,6 +110,17 @@ public class Multiplayer extends AbstractGame {
         return (double) wins / totalGames * 100.0;
     }
 
+    /**
+     * Calculates the completion percentage based on win rate.
+     * For multiplayer games, we use win rate as a measure of "completion" or success.
+     *
+     * @return The win rate percentage (0-100)
+     */
+    @Override
+    public double getCompletionPercentage() {
+        return getWinRate();
+    }
+
     @Override
     public String toString() {
         return super.toString() + " - Multiplayer - " + getProgress();
