@@ -5,6 +5,8 @@ import java.io.Serializable;
 /**
  * Abstract base class for all game types in the video game collection.
  * Implements Serializable for persistence and Playable for game progress tracking.
+ * This class defines common attributes and methods for all games, with abstract methods
+ * that must be implemented by concrete subclasses.
  */
 public abstract class AbstractGame implements Serializable, Playable {
     private static final long serialVersionUID = 1L;
@@ -110,6 +112,36 @@ public abstract class AbstractGame implements Serializable, Playable {
     public String getPlatformString() {
         return platform.getDisplayName();
     }
+
+    /**
+     * Abstract method to update the progress of the game.
+     * Each game type must implement this method to handle progress tracking
+     * in a way that makes sense for that type of game.
+     *
+     * @param progressData A string representation of the progress data
+     * @throws IllegalArgumentException if the progress data is invalid
+     */
+    @Override
+    public abstract void updateProgress(String progressData);
+
+    /**
+     * Abstract method to get a string representation of the current progress.
+     * Each game type must implement this method to display progress
+     * in a way that makes sense for that type of game.
+     *
+     * @return A string showing the current progress
+     */
+    @Override
+    public abstract String getProgress();
+
+    /**
+     * Abstract method to calculate a completion percentage for the game.
+     * Each game type must implement this method to calculate completion
+     * in a way that makes sense for that type of game.
+     *
+     * @return A percentage value between 0 and 100
+     */
+    public abstract double getCompletionPercentage();
 
     @Override
     public String toString() {
