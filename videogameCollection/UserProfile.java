@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import videogameCollection.game.AbstractGame;
+
 /**
  * Represents a user profile in the video game collection application.
  * Stores user information, owned games, reviews, and ratings.
@@ -56,12 +58,12 @@ public class UserProfile implements Serializable {
     }
 
     /**
-     * Gets a defensive copy of the list of games owned by the user.
+     * Gets a definitive copy of the list of games owned by the user.
      *
      * @return A list of games owned by the user
      */
     public List<AbstractGame> getGamesOwned() {
-        return new ArrayList<>(gamesOwned); // Return a defensive copy
+        return new ArrayList<>(gamesOwned); // Return a definitive copy
     }
 
     /**

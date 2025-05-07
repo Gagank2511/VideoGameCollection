@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import videogameCollection.game.AbstractGame;
+
 /**
  * Handles data persistence for the video game collection application.
  * Provides methods to save and load game and user profile data.
@@ -28,12 +30,13 @@ public class DataManager {
      * @return true if the data was saved successfully, false otherwise
      */
     public static boolean saveData(List<AbstractGame> games, UserProfile profile) {
-        boolean success = true;
+        boolean success;
 
         // Save games
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(GAME_FILE))) {
             oos.writeObject(games);
             LOGGER.info("Games saved successfully to " + GAME_FILE);
+            success = true;
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error saving games", e);
             success = false;
@@ -43,6 +46,7 @@ public class DataManager {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PROFILE_FILE))) {
             oos.writeObject(profile);
             LOGGER.info("Profile saved successfully to " + PROFILE_FILE);
+            success = true;
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error saving profile", e);
             success = false;
